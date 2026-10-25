@@ -1,0 +1,558 @@
+import fs from 'fs';
+import path from 'path';
+import crypto from 'crypto';
+import { DatabaseSchema, Employee, Report, Checkpoint, SyncLog, SystemSettings } from './types.ts';
+
+const isServerless = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+const DATA_DIR = isServerless
+  ? path.resolve('/tmp', 'kscp_data')
+  : path.resolve(process.cwd(), 'data');
+const PHOTOS_DIR = path.resolve(DATA_DIR, 'photos');
+const DB_FILE = path.resolve(DATA_DIR, 'kscp_data.json');
+
+const DEFAULT_SETTINGS: SystemSettings = {
+  admin_passcode: '1304',
+  gps_required: false,
+  company_name: 'บริษัท รักษาความปลอดภัย กนกสุวรรณ และ การจัดการความสะดวก จำกัด',
+  google_sheets_url: '',
+  auto_sync_sheets: false,
+  last_sync_time: null,
+};
+
+const INITIAL_EMPLOYEES: Employee[] = [
+  {
+    id: 'emp_01',
+    full_name: 'อานนท์ มีทรัพย์',
+    normalized_name: 'อานนท์ มีทรัพย์',
+    active: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: 'emp_02',
+    full_name: 'อิสมะแอ แวหะมะ',
+    normalized_name: 'อิสมะแอ แวหะมะ',
+    active: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: 'emp_03',
+    full_name: 'เกรียงไกร นวมมณี',
+    normalized_name: 'เกรียงไกร นวมมณี',
+    active: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: 'emp_04',
+    full_name: 'ทะนงศักดิ์ ชัยมัน',
+    normalized_name: 'ทะนงศักดิ์ ชัยมัน',
+    active: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: 'emp_05',
+    full_name: 'มูหามะอับดุลฮาเล็ม ดอรอแม',
+    normalized_name: 'มูหามะอับดุลฮาเล็ม ดอรอแม',
+    active: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: 'emp_06',
+    full_name: 'จิรชาย สาระทรัพย์',
+    normalized_name: 'จิรชาย สาระทรัพย์',
+    active: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: 'emp_07',
+    full_name: 'ฮาฟิส ยูโซะ',
+    normalized_name: 'ฮาฟิส ยูโซะ',
+    active: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: 'emp_08',
+    full_name: 'โกวิท ภักดิ์โสภา',
+    normalized_name: 'โกวิท ภักดิ์โสภา',
+    active: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: 'emp_09',
+    full_name: 'นายมูฮำมัดอารอฟัต ดอรอแม',
+    normalized_name: 'นายมูฮำมัดอารอฟัต ดอรอแม',
+    active: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: 'emp_10',
+    full_name: 'สุบิน นุจิตร',
+    normalized_name: 'สุบิน นุจิตร',
+    active: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+];
+
+const INITIAL_CHECKPOINTS: Checkpoint[] = [
+  // ผลัดกลางวัน (Day Shift)
+  { id: 'chk_day_01', name: 'อาคารอำนวยการ — ด้านหน้าตึก', building: 'อาคารอำนวยการ', point: 'ด้านหน้าตึก', shift: 'day', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_day_02', name: 'อาคารอำนวยการ — ด้านข้างตึก', building: 'อาคารอำนวยการ', point: 'ด้านข้างตึก', shift: 'day', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_day_03', name: 'อาคารอำนวยการ — ด้านหลังตึก', building: 'อาคารอำนวยการ', point: 'ด้านหลังตึก', shift: 'day', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_day_04', name: 'อาคารคีตราชนครินทร์ — ด้านหน้าตึก', building: 'อาคารคีตราชนครินทร์', point: 'ด้านหน้าตึก', shift: 'day', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_day_05', name: 'อาคารคีตราชนครินทร์ — ด้านข้างตึก', building: 'อาคารคีตราชนครินทร์', point: 'ด้านข้างตึก', shift: 'day', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_day_06', name: 'อาคารคีตราชนครินทร์ — ด้านหลังตึก', building: 'อาคารคีตราชนครินทร์', point: 'ด้านหลังตึก', shift: 'day', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_day_07', name: 'อาคารกัลยาณินคีตการ — ด้านหน้าตึก', building: 'อาคารกัลยาณินคีตการ', point: 'ด้านหน้าตึก', shift: 'day', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_day_08', name: 'อาคารกัลยาณินคีตการ — ด้านข้างตึก', building: 'อาคารกัลยาณินคีตการ', point: 'ด้านข้างตึก', shift: 'day', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_day_09', name: 'อาคารกัลยาณินคีตการ — ด้านหลังตึก', building: 'อาคารกัลยาณินคีตการ', point: 'ด้านหลังตึก', shift: 'day', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_day_10', name: 'อาคารศูนย์เรียนรู้และสันทนาการ — ด้านหน้าตึก', building: 'อาคารศูนย์เรียนรู้และสันทนาการ', point: 'ด้านหน้าตึก', shift: 'day', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_day_11', name: 'อาคารศูนย์เรียนรู้และสันทนาการ — ด้านข้างตึก', building: 'อาคารศูนย์เรียนรู้และสันทนาการ', point: 'ด้านข้างตึก', shift: 'day', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_day_12', name: 'อาคารศูนย์เรียนรู้และสันทนาการ — ด้านหลังตึก', building: 'อาคารศูนย์เรียนรู้และสันทนาการ', point: 'ด้านหลังตึก', shift: 'day', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_day_13', name: 'อาคารเก็บเครื่องดนตรี — ด้านหน้าตึก', building: 'อาคารเก็บเครื่องดนตรี', point: 'ด้านหน้าตึก', shift: 'day', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_day_14', name: 'อาคารเก็บเครื่องดนตรี — ด้านข้างตึก', building: 'อาคารเก็บเครื่องดนตรี', point: 'ด้านข้างตึก', shift: 'day', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_day_15', name: 'อาคารเก็บเครื่องดนตรี — ด้านหลังตึก', building: 'อาคารเก็บเครื่องดนตรี', point: 'ด้านหลังตึก', shift: 'day', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+
+  // ผลัดกลางคืน (Night Shift)
+  { id: 'chk_night_01', name: 'อาคารอำนวยการ — ด้านหน้าตึก', building: 'อาคารอำนวยการ', point: 'ด้านหน้าตึก', shift: 'night', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_night_02', name: 'อาคารอำนวยการ — ด้านข้างตึก', building: 'อาคารอำนวยการ', point: 'ด้านข้างตึก', shift: 'night', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_night_03', name: 'อาคารอำนวยการ — ด้านหลังตึก', building: 'อาคารอำนวยการ', point: 'ด้านหลังตึก', shift: 'night', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_night_04', name: 'อาคารอำนวยการ — ด้านหลังฮอล', building: 'อาคารอำนวยการ', point: 'ด้านหลังฮอล', shift: 'night', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_night_05', name: 'อาคารอำนวยการ — ห้อง 209', building: 'อาคารอำนวยการ', point: 'ห้อง 209', shift: 'night', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_night_06', name: 'อาคารอำนวยการ — โถงชั้น 2', building: 'อาคารอำนวยการ', point: 'โถงชั้น 2', shift: 'night', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_night_07', name: 'อาคารคีตราชนครินทร์ — ด้านหน้าตึก', building: 'อาคารคีตราชนครินทร์', point: 'ด้านหน้าตึก', shift: 'night', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_night_08', name: 'อาคารคีตราชนครินทร์ — ด้านข้างตึก', building: 'อาคารคีตราชนครินทร์', point: 'ด้านข้างตึก', shift: 'night', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_night_09', name: 'อาคารคีตราชนครินทร์ — ด้านหลังตึก', building: 'อาคารคีตราชนครินทร์', point: 'ด้านหลังตึก', shift: 'night', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_night_10', name: 'อาคารคีตราชนครินทร์ — ชั้น 2 ระเบียง', building: 'อาคารคีตราชนครินทร์', point: 'ชั้น 2 ระเบียง', shift: 'night', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_night_11', name: 'อาคารคีตราชนครินทร์ — ห้องไฟ', building: 'อาคารคีตราชนครินทร์', point: 'ห้องไฟ', shift: 'night', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_night_12', name: 'อาคารกัลยาณินคีตการ — ชั้น 1 ด้านหน้าตึก', building: 'อาคารกัลยาณินคีตการ', point: 'ชั้น 1 ด้านหน้าตึก', shift: 'night', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_night_13', name: 'อาคารกัลยาณินคีตการ — ชั้น 1 ด้านข้างตึก', building: 'อาคารกัลยาณินคีตการ', point: 'ชั้น 1 ด้านข้างตึก', shift: 'night', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_night_14', name: 'อาคารกัลยาณินคีตการ — ชั้น 1 ด้านหลังตึก', building: 'อาคารกัลยาณินคีตการ', point: 'ชั้น 1 ด้านหลังตึก', shift: 'night', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_night_15', name: 'อาคารกัลยาณินคีตการ — ชั้น 2 หน้าตึก', building: 'อาคารกัลยาณินคีตการ', point: 'ชั้น 2 หน้าตึก', shift: 'night', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_night_16', name: 'อาคารกัลยาณินคีตการ — ชั้น 2 หลังตึก', building: 'อาคารกัลยาณินคีตการ', point: 'ชั้น 2 หลังตึก', shift: 'night', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_night_17', name: 'อาคารกัลยาณินคีตการ — ชั้น 3 หน้าตึก', building: 'อาคารกัลยาณินคีตการ', point: 'ชั้น 3 หน้าตึก', shift: 'night', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_night_18', name: 'อาคารกัลยาณินคีตการ — ชั้น 3 หลังตึก', building: 'อาคารกัลยาณินคีตการ', point: 'ชั้น 3 หลังตึก', shift: 'night', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_night_19', name: 'อาคารกัลยาณินคีตการ — ชั้น 4 หน้าตึก', building: 'อาคารกัลยาณินคีตการ', point: 'ชั้น 4 หน้าตึก', shift: 'night', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_night_20', name: 'อาคารกัลยาณินคีตการ — ชั้น 4 หลังตึก', building: 'อาคารกัลยาณินคีตการ', point: 'ชั้น 4 หลังตึก', shift: 'night', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_night_21', name: 'อาคารกัลยาณินคีตการ — ชั้น 5 หน้าตึก', building: 'อาคารกัลยาณินคีตการ', point: 'ชั้น 5 หน้าตึก', shift: 'night', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_night_22', name: 'อาคารกัลยาณินคีตการ — ชั้น 5 หลังตึก', building: 'อาคารกัลยาณินคีตการ', point: 'ชั้น 5 หลังตึก', shift: 'night', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_night_23', name: 'อาคารศูนย์เรียนรู้และสันทนาการ — ด้านหน้าตึก', building: 'อาคารศูนย์เรียนรู้และสันทนาการ', point: 'ด้านหน้าตึก', shift: 'night', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_night_24', name: 'อาคารศูนย์เรียนรู้และสันทนาการ — ด้านข้างตึก', building: 'อาคารศูนย์เรียนรู้และสันทนาการ', point: 'ด้านข้างตึก', shift: 'night', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_night_25', name: 'อาคารศูนย์เรียนรู้และสันทนาการ — ด้านหลังตึก', building: 'อาคารศูนย์เรียนรู้และสันทนาการ', point: 'ด้านหลังตึก', shift: 'night', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_night_26', name: 'อาคารศูนย์เรียนรู้และสันทนาการ — ห้องน้ำ', building: 'อาคารศูนย์เรียนรู้และสันทนาการ', point: 'ห้องน้ำ', shift: 'night', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_night_27', name: 'อาคารศูนย์เรียนรู้และสันทนาการ — ข้างหลังโรงอาหาร', building: 'อาคารศูนย์เรียนรู้และสันทนาการ', point: 'ข้างหลังโรงอาหาร', shift: 'night', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_night_28', name: 'อาคารเก็บเครื่องดนตรี — ด้านหน้าตึก', building: 'อาคารเก็บเครื่องดนตรี', point: 'ด้านหน้าตึก', shift: 'night', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_night_29', name: 'อาคารเก็บเครื่องดนตรี — ด้านข้างตึก', building: 'อาคารเก็บเครื่องดนตรี', point: 'ด้านข้างตึก', shift: 'night', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_night_30', name: 'อาคารเก็บเครื่องดนตรี — ด้านหลังตึก', building: 'อาคารเก็บเครื่องดนตรี', point: 'ด้านหลังตึก', shift: 'night', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_night_31', name: 'อาคารเก็บเครื่องดนตรี — ชั้น 2', building: 'อาคารเก็บเครื่องดนตรี', point: 'ชั้น 2', shift: 'night', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+  { id: 'chk_night_32', name: 'อาคารเก็บเครื่องดนตรี — ชั้น 3', building: 'อาคารเก็บเครื่องดนตรี', point: 'ชั้น 3', shift: 'night', latitude: 13.7563, longitude: 100.5018, allowed_radius_m: 100, active: true },
+];
+
+let dbMemory: DatabaseSchema | null = null;
+
+export function normalizeName(name: string): string {
+  return name.trim().replace(/\s+/g, ' ');
+}
+
+export function getThailandTime(date = new Date()) {
+  // Use Intl formatters to reliably get Asia/Bangkok components
+  const formatter = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Asia/Bangkok',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  });
+
+  const parts = formatter.formatToParts(date);
+  const partMap: Record<string, string> = {};
+  for (const part of parts) {
+    partMap[part.type] = part.value;
+  }
+
+  const day = partMap.day || '01';
+  const month = partMap.month || '01';
+  const year = partMap.year || '2026';
+  const dateTh = `${day}/${month}/${year}`;
+
+  const hours = partMap.hour || '00';
+  const minutes = partMap.minute || '00';
+  const seconds = partMap.second || '00';
+  const timeTh = `${hours}:${minutes}:${seconds}`;
+
+  const utcIso = date.toISOString(); // e.g. 2026-10-23T08:19:09.123Z
+  const isoWithOffset = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}+07:00`;
+
+  return {
+    dateTh,
+    timeTh,
+    utcIso,
+    isoWithOffset,
+    timestamp: date.getTime(),
+    timezone: 'Asia/Bangkok',
+  };
+}
+
+export function calculateDistanceMeters(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371e3; // Earth radius in meters
+  const phi1 = (lat1 * Math.PI) / 180;
+  const phi2 = (lat2 * Math.PI) / 180;
+  const deltaPhi = ((lat2 - lat1) * Math.PI) / 180;
+  const deltaLambda = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
+    Math.cos(phi1) * Math.cos(phi2) * Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return Math.round(R * c);
+}
+
+export function initDb(): DatabaseSchema {
+  try {
+    if (!fs.existsSync(DATA_DIR)) {
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+    }
+    if (!fs.existsSync(PHOTOS_DIR)) {
+      fs.mkdirSync(PHOTOS_DIR, { recursive: true });
+    }
+  } catch (err) {
+    console.warn('Could not create storage directories, continuing in memory mode:', err);
+  }
+
+  // If running in /tmp (e.g. Vercel), attempt to seed from project root data/kscp_data.json
+  const repoDataFile = path.resolve(process.cwd(), 'data', 'kscp_data.json');
+  if (isServerless && !fs.existsSync(DB_FILE) && fs.existsSync(repoDataFile)) {
+    try {
+      const seedRaw = fs.readFileSync(repoDataFile, 'utf-8');
+      fs.writeFileSync(DB_FILE, seedRaw, 'utf-8');
+    } catch (e) {
+      console.warn('Could not copy seed database to /tmp:', e);
+    }
+  }
+
+  if (fs.existsSync(DB_FILE)) {
+    try {
+      const raw = fs.readFileSync(DB_FILE, 'utf-8');
+      dbMemory = JSON.parse(raw);
+    } catch (e) {
+      console.error('Failed to parse db file, reinitializing', e);
+    }
+  } else if (fs.existsSync(repoDataFile)) {
+    try {
+      const raw = fs.readFileSync(repoDataFile, 'utf-8');
+      dbMemory = JSON.parse(raw);
+    } catch (e) {
+      console.error('Failed to parse repo seed data:', e);
+    }
+  }
+
+  let needsSave = false;
+
+  if (!dbMemory) {
+    dbMemory = {
+      employees: INITIAL_EMPLOYEES,
+      reports: [],
+      checkpoints: INITIAL_CHECKPOINTS,
+      sync_logs: [],
+      settings: DEFAULT_SETTINGS,
+    };
+    needsSave = true;
+  } else {
+    // Ensure schema keys exist
+    if (!dbMemory.employees || dbMemory.employees.length === 0) {
+      dbMemory.employees = INITIAL_EMPLOYEES;
+      needsSave = true;
+    } else {
+      // Check if old sample employees (สมชาย บุญมี, etc.) exist, clean them up and ensure official 10 guards
+      const sampleNames = ['สมชาย บุญมี', 'วิชัย ใจดี', 'ประสิทธิ์ รัตนกิจ', 'อนุชา มั่งคั่ง', 'ตัวอย่าง'];
+      const hasOldSample = dbMemory.employees.some((e) => sampleNames.some((s) => e.full_name.includes(s)));
+      if (hasOldSample) {
+        // Replace with the 10 official guards
+        dbMemory.employees = INITIAL_EMPLOYEES;
+        needsSave = true;
+      }
+    }
+
+    if (!dbMemory.reports) dbMemory.reports = [];
+
+    // Ensure checkpoints list is updated to the comprehensive day/night points
+    if (!dbMemory.checkpoints || dbMemory.checkpoints.length === 0 || dbMemory.checkpoints.some((c) => c.id === 'chk_01')) {
+      dbMemory.checkpoints = INITIAL_CHECKPOINTS;
+      needsSave = true;
+    }
+
+    if (!dbMemory.sync_logs) dbMemory.sync_logs = [];
+    if (!dbMemory.settings) dbMemory.settings = DEFAULT_SETTINGS;
+  }
+
+  if (needsSave) {
+    saveDb();
+  }
+
+  return dbMemory;
+}
+
+export function getDb(): DatabaseSchema {
+  if (!dbMemory) {
+    return initDb();
+  }
+  return dbMemory;
+}
+
+export function saveDb(): void {
+  if (!dbMemory) return;
+  try {
+    if (!fs.existsSync(DATA_DIR)) {
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+    }
+    const tempFile = `${DB_FILE}.${Date.now()}.tmp`;
+    fs.writeFileSync(tempFile, JSON.stringify(dbMemory, null, 2), 'utf-8');
+    fs.renameSync(tempFile, DB_FILE);
+  } catch (err) {
+    console.warn('Warning: saveDb could not write to disk (in-memory state preserved):', err);
+  }
+}
+
+// Employee Helpers
+export function getEmployees(activeOnly = true): Employee[] {
+  const db = getDb();
+  if (activeOnly) {
+    return db.employees.filter((e) => e.active);
+  }
+  return db.employees;
+}
+
+export function findOrCreateEmployee(name: string): Employee {
+  const db = getDb();
+  const normalized = normalizeName(name);
+  let emp = db.employees.find((e) => e.normalized_name.toLowerCase() === normalized.toLowerCase());
+
+  if (emp) {
+    if (!emp.active) {
+      emp.active = true;
+      emp.updated_at = new Date().toISOString();
+      saveDb();
+    }
+    return emp;
+  }
+
+  const newEmp: Employee = {
+    id: `emp_${crypto.randomUUID().slice(0, 8)}`,
+    full_name: normalized,
+    normalized_name: normalized,
+    active: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  };
+
+  db.employees.push(newEmp);
+  saveDb();
+  return newEmp;
+}
+
+export function updateEmployee(id: string, updates: Partial<Employee>): Employee | null {
+  const db = getDb();
+  const emp = db.employees.find((e) => e.id === id);
+  if (!emp) return null;
+
+  if (updates.full_name) {
+    emp.full_name = normalizeName(updates.full_name);
+    emp.normalized_name = normalizeName(updates.full_name);
+  }
+  if (updates.active !== undefined) {
+    emp.active = updates.active;
+  }
+  emp.updated_at = new Date().toISOString();
+  saveDb();
+  return emp;
+}
+
+// Report Helpers
+export function getReports(filter?: {
+  q?: string;
+  startDate?: string;
+  endDate?: string;
+  employee?: string;
+  situation?: string;
+}): Report[] {
+  const db = getDb();
+  let list = [...db.reports];
+
+  // Sort descending by time
+  list.sort((a, b) => new Date(b.report_timestamp_utc).getTime() - new Date(a.report_timestamp_utc).getTime());
+
+  if (!filter) return list;
+
+  if (filter.q && filter.q.trim()) {
+    const term = filter.q.trim().toLowerCase();
+    list = list.filter(
+      (r) =>
+        r.employee_name_snapshot.toLowerCase().includes(term) ||
+        r.report_date_th.includes(term) ||
+        r.report_time_th.includes(term) ||
+        (r.checkpoint_name && r.checkpoint_name.toLowerCase().includes(term)) ||
+        (r.incident_description && r.incident_description.toLowerCase().includes(term))
+    );
+  }
+
+  if (filter.employee && filter.employee.trim()) {
+    const term = filter.employee.trim().toLowerCase();
+    list = list.filter((r) => r.employee_name_snapshot.toLowerCase().includes(term));
+  }
+
+  if (filter.situation && filter.situation !== 'all') {
+    list = list.filter((r) => r.situation === filter.situation);
+  }
+
+  if (filter.startDate) {
+    // Format YYYY-MM-DD or DD/MM/YYYY
+    const sDate = parseFilterDate(filter.startDate);
+    if (sDate) {
+      list = list.filter((r) => {
+        const rDate = parseDateTh(r.report_date_th);
+        return rDate ? rDate >= sDate : true;
+      });
+    }
+  }
+
+  if (filter.endDate) {
+    const eDate = parseFilterDate(filter.endDate);
+    if (eDate) {
+      eDate.setHours(23, 59, 59, 999);
+      list = list.filter((r) => {
+        const rDate = parseDateTh(r.report_date_th);
+        return rDate ? rDate <= eDate : true;
+      });
+    }
+  }
+
+  return list;
+}
+
+function parseFilterDate(str: string): Date | null {
+  if (!str) return null;
+  if (str.includes('-')) {
+    const parts = str.split('-');
+    if (parts.length === 3) {
+      return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+    }
+  }
+  return parseDateTh(str);
+}
+
+function parseDateTh(dateTh: string): Date | null {
+  // DD/MM/YYYY
+  const parts = dateTh.split('/');
+  if (parts.length === 3) {
+    const d = Number(parts[0]);
+    const m = Number(parts[1]) - 1;
+    const y = Number(parts[2]);
+    return new Date(y, m, d);
+  }
+  return null;
+}
+
+export function getReportById(id: string): Report | null {
+  const db = getDb();
+  return db.reports.find((r) => r.id === id) || null;
+}
+
+export function addReport(report: Report): Report {
+  const db = getDb();
+  db.reports.unshift(report);
+  saveDb();
+  return report;
+}
+
+export function markReportsSynced(ids: string[]): void {
+  const db = getDb();
+  const idSet = new Set(ids);
+  for (const r of db.reports) {
+    if (idSet.has(r.id)) {
+      r.record_status = 'synced';
+    }
+  }
+  saveDb();
+}
+
+// Checkpoints
+export function getCheckpoints(): Checkpoint[] {
+  return getDb().checkpoints;
+}
+
+export function addCheckpoint(cp: Omit<Checkpoint, 'id'>): Checkpoint {
+  const db = getDb();
+  const newCp: Checkpoint = {
+    ...cp,
+    id: `chk_${crypto.randomUUID().slice(0, 8)}`,
+  };
+  db.checkpoints.push(newCp);
+  saveDb();
+  return newCp;
+}
+
+export function updateCheckpoint(id: string, updates: Partial<Checkpoint>): Checkpoint | null {
+  const db = getDb();
+  const cp = db.checkpoints.find((c) => c.id === id);
+  if (!cp) return null;
+  Object.assign(cp, updates);
+  saveDb();
+  return cp;
+}
+
+export function deleteCheckpoint(id: string): boolean {
+  const db = getDb();
+  const initialLength = db.checkpoints.length;
+  db.checkpoints = db.checkpoints.filter((c) => c.id !== id);
+  if (db.checkpoints.length !== initialLength) {
+    saveDb();
+    return true;
+  }
+  return false;
+}
+
+// Settings
+export function getSettings(): SystemSettings {
+  return getDb().settings;
+}
+
+export function updateSettings(updates: Partial<SystemSettings>): SystemSettings {
+  const db = getDb();
+  Object.assign(db.settings, updates);
+  saveDb();
+  return db.settings;
+}
+
+// Sync Logs
+export function addSyncLog(log: Omit<SyncLog, 'id' | 'synced_at'>): SyncLog {
+  const db = getDb();
+  const newLog: SyncLog = {
+    ...log,
+    id: `sync_${crypto.randomUUID().slice(0, 8)}`,
+    synced_at: new Date().toISOString(),
+  };
+  db.sync_logs.unshift(newLog);
+  // Keep only last 50 logs
+  if (db.sync_logs.length > 50) {
+    db.sync_logs = db.sync_logs.slice(0, 50);
+  }
+  saveDb();
+  return newLog;
+}
+
+export function getSyncLogs(): SyncLog[] {
+  return getDb().sync_logs;
+}
+
+// Photos path helper
+export { PHOTOS_DIR };

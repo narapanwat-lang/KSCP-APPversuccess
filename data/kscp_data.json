@@ -1,0 +1,613 @@
+{
+  "employees": [
+    {
+      "id": "emp_01",
+      "full_name": "อานนท์ มีทรัพย์",
+      "normalized_name": "อานนท์ มีทรัพย์",
+      "active": true,
+      "created_at": "2026-10-25T00:00:00.000Z",
+      "updated_at": "2026-10-25T00:00:00.000Z"
+    },
+    {
+      "id": "emp_02",
+      "full_name": "อิสมะแอ แวหะมะ",
+      "normalized_name": "อิสมะแอ แวหะมะ",
+      "active": true,
+      "created_at": "2026-10-25T00:00:00.000Z",
+      "updated_at": "2026-10-25T00:00:00.000Z"
+    },
+    {
+      "id": "emp_03",
+      "full_name": "เกรียงไกร นวมมณี",
+      "normalized_name": "เกรียงไกร นวมมณี",
+      "active": true,
+      "created_at": "2026-10-25T00:00:00.000Z",
+      "updated_at": "2026-10-25T00:00:00.000Z"
+    },
+    {
+      "id": "emp_04",
+      "full_name": "ทะนงศักดิ์ ชัยมัน",
+      "normalized_name": "ทะนงศักดิ์ ชัยมัน",
+      "active": true,
+      "created_at": "2026-10-25T00:00:00.000Z",
+      "updated_at": "2026-10-25T00:00:00.000Z"
+    },
+    {
+      "id": "emp_05",
+      "full_name": "มูหามะอับดุลฮาเล็ม ดอรอแม",
+      "normalized_name": "มูหามะอับดุลฮาเล็ม ดอรอแม",
+      "active": true,
+      "created_at": "2026-10-25T00:00:00.000Z",
+      "updated_at": "2026-10-25T00:00:00.000Z"
+    },
+    {
+      "id": "emp_06",
+      "full_name": "จิรชาย สาระทรัพย์",
+      "normalized_name": "จิรชาย สาระทรัพย์",
+      "active": true,
+      "created_at": "2026-10-25T00:00:00.000Z",
+      "updated_at": "2026-10-25T00:00:00.000Z"
+    },
+    {
+      "id": "emp_07",
+      "full_name": "ฮาฟิส ยูโซะ",
+      "normalized_name": "ฮาฟิส ยูโซะ",
+      "active": true,
+      "created_at": "2026-10-25T00:00:00.000Z",
+      "updated_at": "2026-10-25T00:00:00.000Z"
+    },
+    {
+      "id": "emp_08",
+      "full_name": "โกวิท ภักดิ์โสภา",
+      "normalized_name": "โกวิท ภักดิ์โสภา",
+      "active": true,
+      "created_at": "2026-10-25T00:00:00.000Z",
+      "updated_at": "2026-10-25T00:00:00.000Z"
+    },
+    {
+      "id": "emp_09",
+      "full_name": "นายมูฮำมัดอารอฟัต ดอรอแม",
+      "normalized_name": "นายมูฮำมัดอารอฟัต ดอรอแม",
+      "active": true,
+      "created_at": "2026-10-25T00:00:00.000Z",
+      "updated_at": "2026-10-25T00:00:00.000Z"
+    },
+    {
+      "id": "emp_10",
+      "full_name": "สุบิน นุจิตร",
+      "normalized_name": "สุบิน นุจิตร",
+      "active": true,
+      "created_at": "2026-10-25T00:00:00.000Z",
+      "updated_at": "2026-10-25T00:00:00.000Z"
+    }
+  ],
+  "reports": [],
+  "checkpoints": [
+    {
+      "id": "chk_day_01",
+      "name": "อาคารอำนวยการ — ด้านหน้าตึก",
+      "building": "อาคารอำนวยการ",
+      "point": "ด้านหน้าตึก",
+      "shift": "day",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_day_02",
+      "name": "อาคารอำนวยการ — ด้านข้างตึก",
+      "building": "อาคารอำนวยการ",
+      "point": "ด้านข้างตึก",
+      "shift": "day",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_day_03",
+      "name": "อาคารอำนวยการ — ด้านหลังตึก",
+      "building": "อาคารอำนวยการ",
+      "point": "ด้านหลังตึก",
+      "shift": "day",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_day_04",
+      "name": "อาคารคีตราชนครินทร์ — ด้านหน้าตึก",
+      "building": "อาคารคีตราชนครินทร์",
+      "point": "ด้านหน้าตึก",
+      "shift": "day",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_day_05",
+      "name": "อาคารคีตราชนครินทร์ — ด้านข้างตึก",
+      "building": "อาคารคีตราชนครินทร์",
+      "point": "ด้านข้างตึก",
+      "shift": "day",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_day_06",
+      "name": "อาคารคีตราชนครินทร์ — ด้านหลังตึก",
+      "building": "อาคารคีตราชนครินทร์",
+      "point": "ด้านหลังตึก",
+      "shift": "day",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_day_07",
+      "name": "อาคารกัลยาณินคีตการ — ด้านหน้าตึก",
+      "building": "อาคารกัลยาณินคีตการ",
+      "point": "ด้านหน้าตึก",
+      "shift": "day",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_day_08",
+      "name": "อาคารกัลยาณินคีตการ — ด้านข้างตึก",
+      "building": "อาคารกัลยาณินคีตการ",
+      "point": "ด้านข้างตึก",
+      "shift": "day",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_day_09",
+      "name": "อาคารกัลยาณินคีตการ — ด้านหลังตึก",
+      "building": "อาคารกัลยาณินคีตการ",
+      "point": "ด้านหลังตึก",
+      "shift": "day",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_day_10",
+      "name": "อาคารศูนย์เรียนรู้และสันทนาการ — ด้านหน้าตึก",
+      "building": "อาคารศูนย์เรียนรู้และสันทนาการ",
+      "point": "ด้านหน้าตึก",
+      "shift": "day",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_day_11",
+      "name": "อาคารศูนย์เรียนรู้และสันทนาการ — ด้านข้างตึก",
+      "building": "อาคารศูนย์เรียนรู้และสันทนาการ",
+      "point": "ด้านข้างตึก",
+      "shift": "day",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_day_12",
+      "name": "อาคารศูนย์เรียนรู้และสันทนาการ — ด้านหลังตึก",
+      "building": "อาคารศูนย์เรียนรู้และสันทนาการ",
+      "point": "ด้านหลังตึก",
+      "shift": "day",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_day_13",
+      "name": "อาคารเก็บเครื่องดนตรี — ด้านหน้าตึก",
+      "building": "อาคารเก็บเครื่องดนตรี",
+      "point": "ด้านหน้าตึก",
+      "shift": "day",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_day_14",
+      "name": "อาคารเก็บเครื่องดนตรี — ด้านข้างตึก",
+      "building": "อาคารเก็บเครื่องดนตรี",
+      "point": "ด้านข้างตึก",
+      "shift": "day",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_day_15",
+      "name": "อาคารเก็บเครื่องดนตรี — ด้านหลังตึก",
+      "building": "อาคารเก็บเครื่องดนตรี",
+      "point": "ด้านหลังตึก",
+      "shift": "day",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_night_01",
+      "name": "อาคารอำนวยการ — ด้านหน้าตึก",
+      "building": "อาคารอำนวยการ",
+      "point": "ด้านหน้าตึก",
+      "shift": "night",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_night_02",
+      "name": "อาคารอำนวยการ — ด้านข้างตึก",
+      "building": "อาคารอำนวยการ",
+      "point": "ด้านข้างตึก",
+      "shift": "night",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_night_03",
+      "name": "อาคารอำนวยการ — ด้านหลังตึก",
+      "building": "อาคารอำนวยการ",
+      "point": "ด้านหลังตึก",
+      "shift": "night",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_night_04",
+      "name": "อาคารอำนวยการ — ด้านหลังฮอล",
+      "building": "อาคารอำนวยการ",
+      "point": "ด้านหลังฮอล",
+      "shift": "night",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_night_05",
+      "name": "อาคารอำนวยการ — ห้อง 209",
+      "building": "อาคารอำนวยการ",
+      "point": "ห้อง 209",
+      "shift": "night",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_night_06",
+      "name": "อาคารอำนวยการ — โถงชั้น 2",
+      "building": "อาคารอำนวยการ",
+      "point": "โถงชั้น 2",
+      "shift": "night",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_night_07",
+      "name": "อาคารคีตราชนครินทร์ — ด้านหน้าตึก",
+      "building": "อาคารคีตราชนครินทร์",
+      "point": "ด้านหน้าตึก",
+      "shift": "night",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_night_08",
+      "name": "อาคารคีตราชนครินทร์ — ด้านข้างตึก",
+      "building": "อาคารคีตราชนครินทร์",
+      "point": "ด้านข้างตึก",
+      "shift": "night",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_night_09",
+      "name": "อาคารคีตราชนครินทร์ — ด้านหลังตึก",
+      "building": "อาคารคีตราชนครินทร์",
+      "point": "ด้านหลังตึก",
+      "shift": "night",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_night_10",
+      "name": "อาคารคีตราชนครินทร์ — ชั้น 2 ระเบียง",
+      "building": "อาคารคีตราชนครินทร์",
+      "point": "ชั้น 2 ระเบียง",
+      "shift": "night",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_night_11",
+      "name": "อาคารคีตราชนครินทร์ — ห้องไฟ",
+      "building": "อาคารคีตราชนครินทร์",
+      "point": "ห้องไฟ",
+      "shift": "night",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_night_12",
+      "name": "อาคารกัลยาณินคีตการ — ชั้น 1 ด้านหน้าตึก",
+      "building": "อาคารกัลยาณินคีตการ",
+      "point": "ชั้น 1 ด้านหน้าตึก",
+      "shift": "night",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_night_13",
+      "name": "อาคารกัลยาณินคีตการ — ชั้น 1 ด้านข้างตึก",
+      "building": "อาคารกัลยาณินคีตการ",
+      "point": "ชั้น 1 ด้านข้างตึก",
+      "shift": "night",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_night_14",
+      "name": "อาคารกัลยาณินคีตการ — ชั้น 1 ด้านหลังตึก",
+      "building": "อาคารกัลยาณินคีตการ",
+      "point": "ชั้น 1 ด้านหลังตึก",
+      "shift": "night",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_night_15",
+      "name": "อาคารกัลยาณินคีตการ — ชั้น 2 หน้าตึก",
+      "building": "อาคารกัลยาณินคีตการ",
+      "point": "ชั้น 2 หน้าตึก",
+      "shift": "night",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_night_16",
+      "name": "อาคารกัลยาณินคีตการ — ชั้น 2 หลังตึก",
+      "building": "อาคารกัลยาณินคีตการ",
+      "point": "ชั้น 2 หลังตึก",
+      "shift": "night",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_night_17",
+      "name": "อาคารกัลยาณินคีตการ — ชั้น 3 หน้าตึก",
+      "building": "อาคารกัลยาณินคีตการ",
+      "point": "ชั้น 3 หน้าตึก",
+      "shift": "night",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_night_18",
+      "name": "อาคารกัลยาณินคีตการ — ชั้น 3 หลังตึก",
+      "building": "อาคารกัลยาณินคีตการ",
+      "point": "ชั้น 3 หลังตึก",
+      "shift": "night",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_night_19",
+      "name": "อาคารกัลยาณินคีตการ — ชั้น 4 หน้าตึก",
+      "building": "อาคารกัลยาณินคีตการ",
+      "point": "ชั้น 4 หน้าตึก",
+      "shift": "night",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_night_20",
+      "name": "อาคารกัลยาณินคีตการ — ชั้น 4 หลังตึก",
+      "building": "อาคารกัลยาณินคีตการ",
+      "point": "ชั้น 4 หลังตึก",
+      "shift": "night",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_night_21",
+      "name": "อาคารกัลยาณินคีตการ — ชั้น 5 หน้าตึก",
+      "building": "อาคารกัลยาณินคีตการ",
+      "point": "ชั้น 5 หน้าตึก",
+      "shift": "night",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_night_22",
+      "name": "อาคารกัลยาณินคีตการ — ชั้น 5 หลังตึก",
+      "building": "อาคารกัลยาณินคีตการ",
+      "point": "ชั้น 5 หลังตึก",
+      "shift": "night",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_night_23",
+      "name": "อาคารศูนย์เรียนรู้และสันทนาการ — ด้านหน้าตึก",
+      "building": "อาคารศูนย์เรียนรู้และสันทนาการ",
+      "point": "ด้านหน้าตึก",
+      "shift": "night",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_night_24",
+      "name": "อาคารศูนย์เรียนรู้และสันทนาการ — ด้านข้างตึก",
+      "building": "อาคารศูนย์เรียนรู้และสันทนาการ",
+      "point": "ด้านข้างตึก",
+      "shift": "night",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_night_25",
+      "name": "อาคารศูนย์เรียนรู้และสันทนาการ — ด้านหลังตึก",
+      "building": "อาคารศูนย์เรียนรู้และสันทนาการ",
+      "point": "ด้านหลังตึก",
+      "shift": "night",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_night_26",
+      "name": "อาคารศูนย์เรียนรู้และสันทนาการ — ห้องน้ำ",
+      "building": "อาคารศูนย์เรียนรู้และสันทนาการ",
+      "point": "ห้องน้ำ",
+      "shift": "night",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_night_27",
+      "name": "อาคารศูนย์เรียนรู้และสันทนาการ — ข้างหลังโรงอาหาร",
+      "building": "อาคารศูนย์เรียนรู้และสันทนาการ",
+      "point": "ข้างหลังโรงอาหาร",
+      "shift": "night",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_night_28",
+      "name": "อาคารเก็บเครื่องดนตรี — ด้านหน้าตึก",
+      "building": "อาคารเก็บเครื่องดนตรี",
+      "point": "ด้านหน้าตึก",
+      "shift": "night",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_night_29",
+      "name": "อาคารเก็บเครื่องดนตรี — ด้านข้างตึก",
+      "building": "อาคารเก็บเครื่องดนตรี",
+      "point": "ด้านข้างตึก",
+      "shift": "night",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_night_30",
+      "name": "อาคารเก็บเครื่องดนตรี — ด้านหลังตึก",
+      "building": "อาคารเก็บเครื่องดนตรี",
+      "point": "ด้านหลังตึก",
+      "shift": "night",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_night_31",
+      "name": "อาคารเก็บเครื่องดนตรี — ชั้น 2",
+      "building": "อาคารเก็บเครื่องดนตรี",
+      "point": "ชั้น 2",
+      "shift": "night",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    },
+    {
+      "id": "chk_night_32",
+      "name": "อาคารเก็บเครื่องดนตรี — ชั้น 3",
+      "building": "อาคารเก็บเครื่องดนตรี",
+      "point": "ชั้น 3",
+      "shift": "night",
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "allowed_radius_m": 100,
+      "active": true
+    }
+  ],
+  "sync_logs": [],
+  "settings": {
+    "admin_passcode": "1304",
+    "gps_required": false,
+    "company_name": "บริษัท รักษาความปลอดภัย กนกสุวรรณ และ การจัดการความสะดวก จำกัด",
+    "google_sheets_url": "",
+    "auto_sync_sheets": false,
+    "last_sync_time": null
+  }
+}
